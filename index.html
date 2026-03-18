@@ -36,49 +36,53 @@ canvas {
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/blasten/turn.js@4/turn.min.js"></script>
-<!-- PDF.js oficial de Mozilla -->
-<script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+<!-- PDF.js que funciona en GitHub Pages -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.15.141/pdf.min.js"></script>
 
 <script>
 const url = 'catalogo.pdf'; // PDF en la misma carpeta
 
 // Configuración del worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.js';
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.15.141/pdf.worker.min.js';
 
 async function loadPDF() {
-  const pdf = await pdfjsLib.getDocument(url).promise;
-  const flipbook = document.getElementById('flipbook');
-  const pages = [];
+  try {
+    const pdf = await pdfjsLib.getDocument(url).promise;
+    const flipbook = document.getElementById('flipbook');
+    const pages = [];
 
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const scale = 1.5;
-    const viewport = page.getViewport({scale: scale});
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const scale = 1.5;
+      const viewport = page.getViewport({scale: scale});
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
 
-    await page.render({canvasContext: context, viewport: viewport}).promise;
+      await page.render({canvasContext: context, viewport: viewport}).promise;
 
-    const pageDiv = document.createElement('div');
-    pageDiv.appendChild(canvas);
-    flipbook.appendChild(pageDiv);
+      const pageDiv = document.createElement('div');
+      pageDiv.appendChild(canvas);
+      flipbook.appendChild(pageDiv);
 
-    pages.push({width: viewport.width, height: viewport.height});
+      pages.push({width: viewport.width, height: viewport.height});
+    }
+
+    const firstPage = pages[0];
+    $('#flipbook').turn({
+      width: $('#flipbook').width(),
+      height: firstPage.height * ($('#flipbook').width()/firstPage.width),
+      autoCenter: true,
+      display: 'double',
+      acceleration: true
+    });
+  } catch(err) {
+    console.error('Error al cargar PDF:', err);
   }
-
-  const firstPage = pages[0];
-  $('#flipbook').turn({
-    width: $('#flipbook').width(),
-    height: firstPage.height * ($('#flipbook').width()/firstPage.width),
-    autoCenter: true,
-    display: 'double',
-    acceleration: true
-  });
 }
 
-loadPDF().catch(err => console.error('Error al cargar PDF:', err));
+loadPDF();
 </script>
 
 </body>
