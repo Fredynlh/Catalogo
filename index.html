@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Catálogo Flipbook</title>
 
-<!-- CSS de Turn.js -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/blasten/turn.js@4/turn.min.css">
 
 <style>
@@ -35,18 +34,17 @@ canvas {
 
 <div id="flipbook"></div>
 
-<!-- Librerías JS desde CDN -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/blasten/turn.js@4/turn.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.15.141/pdf.min.js"></script>
+<!-- PDF.js oficial de Mozilla -->
+<script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
 
 <script>
 const url = 'catalogo.pdf'; // PDF en la misma carpeta
 
-// Configuración de PDF.js
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.15.141/pdf.worker.min.js';
+// Configuración del worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.js';
 
-// Función para cargar PDF y convertirlo en flipbook
 async function loadPDF() {
   const pdf = await pdfjsLib.getDocument(url).promise;
   const flipbook = document.getElementById('flipbook');
@@ -70,7 +68,6 @@ async function loadPDF() {
     pages.push({width: viewport.width, height: viewport.height});
   }
 
-  // Ajustar tamaño final del flipbook basado en la primera página
   const firstPage = pages[0];
   $('#flipbook').turn({
     width: $('#flipbook').width(),
@@ -81,7 +78,6 @@ async function loadPDF() {
   });
 }
 
-// Llamar función
 loadPDF().catch(err => console.error('Error al cargar PDF:', err));
 </script>
 
